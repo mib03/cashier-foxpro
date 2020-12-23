@@ -1,0 +1,13 @@
+DEFINE CLASS formuaa as Form
+	ADD OBJECT txtid as textbox WITH Value = Null, NullDisplay = "Find...", ForeColor = RGB(120,120,120)
+	ADD OBJECT txt2 as textbox WITH top = 50
+
+	PROCEDURE txtid.interactivechange
+		IF EMPTY(This.value) 
+			This.Value = Null
+			This.ForeColor = RGB(200,200,200)
+		ELSE
+			This.ForeColor = 0
+		ENDIF
+	ENDPROC
+ENDDEFINE 

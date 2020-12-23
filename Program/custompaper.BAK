@@ -1,0 +1,67 @@
+Local hPrinter
+Local cPrinterName, cPaperName
+Local pPaperName, sPaperSize
+Local nResult, nBufLen, nPaperWidth, nPaperHeight
+
+Declare Long GetLastError in Kernel32
+Declare Long ClosePrinter in WinSpool.Drv Long hPrinter
+Declare Long OpenPrinter in WinSpool.Drv ;
+String cPrinterName, Long @O_hPrinter, Long pDefault
+
+Declare Long GetForm in WinSpool.drv as GetPrinterForm ;
+Long hPrinter, String pFormName, ;
+Long nLevelInfo, String @O_pFormInfo, ;
+Long nBufSize, Long @O_nBufNeeded
+
+Declare Long AddForm in WinSpool.drv as AddPrinterForm ;
+Long hPrinter, Long nLevelInfo, String @pFormInfo
+
+Declare Long LocalAlloc in Kernel32 Long uFlags, Long dwBytes
+Declare Long LocalFree in Kernel32 Long hMem
+
+cPrinterName = set( 'Printer', 2 ) && Get default Windows printer
+hPrinter = 0
+
+If (OpenPrinter( cPrinterName, @hPrinter, 0 ) != 0)
+cPaperName = 'MyCustom - Half A4'
+nBufLen = 32 && FORM_INFO_1_Size
+cInfo = replicate( chr(0), 32 )
+nResult = GetPrinterForm( hPrinter, cPaperName, 1, ;
+@cInfo, nBufLen, @nBufLen )
+
+If (nResult == 0) && Get printer form failed
+nResult = GetLastError()
+
+If (nResult == 1902) && ERROR_INVALID_FORM_NAME
+** Custom Printer Form not exist, add the new one
+nPaperWidth = 210000 / 2 && Paper size is in 1/1000 millimeters
+nPaperHeight = 297000 / 2
+sPaperSize = BinToC( nPaperWidth, '4rs' ) + BinToC( nPaperHeight, '4rs' )
+pPaperName = LocalAlloc( 64, 32 )
+
+If (pPaperName != 0)
+sys( 2600, pPaperName, len( cPaperName ), cPaperName )
+cInfo = BinToC( 0, '4rs' ) + BinToC( pPaperName, '4rs' ) + ;
+sPaperSize + BinToC( 0, '4rs' ) + BinToC( 0, '4rs' ) + sPaperSize
+
+If (AddPrinterForm( hPrinter, 1, cInfo ) != 0)
+? 'Custom paper form (' + cPaperName + ') has been added! '
+else
+? 'Error:', GetLastError()
+endif
+
+LocalFree( pPaperName )
+endif
+
+else
+If (nResult == 122) && Insufficient buffer
+? 'Error: Custom Paper Form already exist!'
+else
+? 'Error: ', nResult
+endif
+endif
+else
+? 'Error: ', nResult
+endif
+ClosePrinter( hPrinter )
+endif

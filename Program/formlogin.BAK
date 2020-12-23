@@ -1,0 +1,10 @@
+PROCEDURE pergi
+IF MESSAGEBOX("Apakah yakin ingin keluar?",4+32,"Konfirmasi Keluar") = 6
+	CLOSE ALL
+	thisform.Release
+	CANCEL ALL 
+	QUIT
+ELSE
+	NODEFAULT
+ENDIF
+ENDPROC

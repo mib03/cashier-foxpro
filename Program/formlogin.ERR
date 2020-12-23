@@ -1,0 +1,2 @@
+pesan MESSAGEBOX("Apakah yakin ingin keluar?",4+32,"Konfirmasi Keluar")
+Error in line 3: Unrecognized command verb.

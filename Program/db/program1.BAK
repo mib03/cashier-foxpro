@@ -1,0 +1,5 @@
+ON SHUTDOWN Do ProperShutDown
+*** START PROGRAM
+DO FORM First NAME frmFirst LINKED
+READ events
+CLEAR EVENTS
